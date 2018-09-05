@@ -1,0 +1,35 @@
+{
+  "name": "weapp-boilerplate",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "gulp dev",
+    "build": "gulp build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tjeeay/weapp-boilerplate.git"
+  },
+  "keywords": [
+    "weapp",
+    "mini-program",
+    "single-file"
+  ],
+  "author": "Tee Jay <tjeeay@outlook.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tjeeay/weapp-boilerplate/issues"
+  },
+  "homepage": "https://github.com/tjeeay/weapp-boilerplate#readme",
+  "devDependencies": {
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-mina-vue": "0.0.1",
+    "gulp-pug": "^4.0.1",
+    "gulp-rename": "^1.4.0",
+    "gulp-sass": "^4.0.1",
+    "run-sequence": "^2.2.1"
+  }
+}
