@@ -9,7 +9,7 @@
 	},
 	"compileType": "miniprogram",
 	"libVersion": "2.2.0",
-	"appid": "wxfbeccd71824bad2c",
+	"appid": "touristappid",
 	"projectname": "weapp-boilerplate",
 	"miniprogramRoot": "./dist",
 	"condition": {
