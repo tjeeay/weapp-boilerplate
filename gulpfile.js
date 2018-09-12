@@ -7,27 +7,33 @@ plugins.uglify = require('gulp-uglify-es').default
 const isProduction = () => process.env.NODE_ENV === 'production'
 
 const distDir = './dist'
+gulp.task('clean', _ => del(`${distDir}/*`))
 
-const babelOptions = {
-  presets: ['@babel/env'],
-  plugins: ['@babel/transform-runtime']
-}
-
-const isVue = (file) => path.extname(file.path) === '.vue'
-
-gulp.task('clean', _ => del(`${distDir}/**/*.*`))
-
-gulp.task('compile:MINA.wxml', _ => {
-  return gulp.src('./src/**/*.{vue,jade,pug}')
-    .pipe(plugins.if(isVue, plugins.minaVue.template()))
+// template (vue, jade, pug)
+const compileTemplete = (src) => {
+  return src
     .pipe(plugins.pug({ pretty: !isProduction() }))
     .pipe(plugins.rename({ extname: '.wxml' }))
     .pipe(gulp.dest(distDir))
+}
+
+gulp.task('compile:MINA.wxml', _ => {
+  const src = gulp.src('./src/**/*.vue')
+    .pipe(plugins.minaVue.template())
+  return compileTemplete(src)
+})
+gulp.task('compile:jade', _ => {
+  const src = gulp.src('./src/**/*.jade')
+  return compileTemplete(src)
+})
+gulp.task('compile:pug', _ => {
+  const src = gulp.src('./src/**/*.pug')
+  return compileTemplete(src)
 })
 
-gulp.task('compile:MINA.wxss', _ => {
-  return gulp.src('./src/**/*.{vue,scss}')
-    .pipe(plugins.if(isVue, plugins.minaVue.style()))
+// style (vue, scss)
+const compileStyle = (src) => {
+  return src
     .pipe(plugins.sass())
     .pipe(plugins.rename({ extname: '.wxss' }))
     .pipe(plugins.if(isProduction(), plugins.cssnano()))
@@ -39,50 +45,55 @@ gulp.task('compile:MINA.wxss', _ => {
       debug: !isProduction()
     })))
     .pipe(gulp.dest(distDir))
+}
+
+gulp.task('compile:MINA.wxss', _ => {
+  const src = gulp.src('./src/**/*.vue')
+    .pipe(plugins.minaVue.style())
+  return compileStyle(src)
+})
+gulp.task('compile:scss', _ => {
+  const src = gulp.src('./src/**/*.scss')
+  return compileStyle(src)
 })
 
-gulp.task('compile:MINA.js', _ => {
-  return gulp.src('./src/**/*.{vue,js}')
-    .pipe(plugins.if(isVue, plugins.minaVue.script()))
-    .pipe(plugins.babel(babelOptions))
+// script (vue, js)
+const compileScript = (src) => {
+  return src
+    .pipe(plugins.babel({
+      presets: ['@babel/env'],
+      plugins: ['@babel/transform-runtime']
+    }))
     .pipe(plugins.if(isProduction(), plugins.uglify()))
     .pipe(gulp.dest(distDir))
+}
+
+gulp.task('compile:MINA.js', _ => {
+  const src = gulp.src('./src/**/*.vue')
+    .pipe(plugins.minaVue.script())
+  return compileScript(src)
+})
+gulp.task('compile:js', _ => {
+  const src = gulp.src('./src/**/*.js')
+  return compileScript(src)
 })
 
-gulp.task('compile:MINA.json', _ => {
-  return gulp.src('./src/**/*.{vue,json}')
-    .pipe(plugins.if(isVue, plugins.minaVue.config()))
+// config (vue, json)
+const compileConfig = (src) => {
+  return src
     .pipe(plugins.if(isProduction(), plugins.jsonminify()))
     .pipe(gulp.dest(distDir))
+}
+
+gulp.task('compile:MINA.json', _ => {
+  const src = gulp.src('./src/**/*.vue')
+    .pipe(plugins.minaVue.config())
+  return compileConfig(src)
 })
-
-// gulp.task('compile:*.scss', _ => {
-//   return gulp.src('./src/**/*.scss')
-//     .pipe(plugins.sass())
-//     .pipe(plugins.rename({ extname: '.wxss' }))
-//     .pipe(plugins.if(isProduction(), plugins.cssnano()))
-//     .pipe(plugins.base64({
-//       extensions: ['svg', 'png', /\.jpg#datauri$/i],
-//       exclude: [/\.server\.(com|net)\/dynamic\//, '--live.jpg'],
-//       maxImageSize: 8 * 1024,
-//       deleteAfterEncoding: false,
-//       debug: !isProduction()
-//     }))
-//     .pipe(gulp.dest(distDir))
-// })
-
-// gulp.task('compile:*.js', _ => {
-//   return gulp.src('./src/**/*.js')
-//     .pipe(plugins.babel(babelOptions))
-//     .pipe(plugins.if(isProduction(), plugins.uglify()))
-//     .pipe(gulp.dest(distDir))
-// })
-
-// gulp.task('compress:*.json', _ => {
-//   return gulp.src('./src/**/*.json')
-//     .pipe(plugins.if(isProduction(), plugins.jsonminify()))
-//     .pipe(gulp.dest(distDir))
-// })
+gulp.task('compile:json', _ => {
+  const src = gulp.src('./src/**/*.json')
+  return compileConfig(src)
+})
 
 gulp.task('compress:img', () => {
   return gulp.src(['src/**/*.{jpg,jpeg,png,gif,svg}'])
@@ -105,6 +116,7 @@ gulp.task('copy', [], _ => {
   return gulp.src([
       'src/**/*.*',
       '!src/**/*.vue',
+      '!src/**/*.{jade,pug}',
       '!src/**/*.scss',
       '!src/**/*.js',
       '!src/**/*.json',
@@ -119,27 +131,30 @@ gulp.task('build', ['clean'], next => {
       'compile:MINA.wxss',
       'compile:MINA.js',
       'compile:MINA.json',
-      // 'compile:*.scss',
-      // 'compile:*.js',
-      // 'compress:*.json',
+      'compile:jade',
+      'compile:pug',
+      'compile:scss',
+      'compile:js',
+      'compile:json',
       'compress:img'
     ], next)
 })
 
 gulp.task('watch', _ => {
   gulp.watch([
-      'src/**/*.vue'
-    ], [
-      'compile:MINA.wxml',
-      'compile:MINA.wxss',
-      'compile:MINA.scss',
-      'compile:MINA.js',
-      'compile:MINA.json'
-    ])
+    'src/**/*.vue'
+  ], [
+    'compile:MINA.wxml',
+    'compile:MINA.wxss',
+    'compile:MINA.js',
+    'compile:MINA.json'
+  ])
 
-  gulp.watch(['src/**/*.scss'], ['compile:MINA.wxss'])
-  gulp.watch(['src/**/*.js'], ['compile:MINA.js'])
-  gulp.watch(['src/**/*.json'], ['compile:MINA.json'])
+  gulp.watch(['src/**/*.jade'], ['compile:jade'])
+  gulp.watch(['src/**/*.pug'], ['compile:pug'])
+  gulp.watch(['src/**/*.scss'], ['compile:scss'])
+  gulp.watch(['src/**/*.js'], ['compile:js'])
+  gulp.watch(['src/**/*.json'], ['compile:json'])
   gulp.watch(['src/**/*.{jpg,jpeg,png,gif,svg}'], ['compress:img'])
 })
 
