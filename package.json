@@ -44,8 +44,5 @@
     "gulp-sass": "^4.0.1",
     "gulp-uglify-es": "^1.0.4",
     "run-sequence": "^2.2.1"
-  },
-  "dependencies": {
-    "@babel/runtime": "^7.0.0"
   }
 }

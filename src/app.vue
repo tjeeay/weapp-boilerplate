@@ -1,4 +1,6 @@
 <script>
+import './lib/extend.js'
+
 export default App({
   config: {
     homepage: 'pages/home/home',

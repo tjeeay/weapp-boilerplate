@@ -3,20 +3,26 @@
     view.title {{title}}
     view.desc {{desc}}
   
-    navigator(
-      url="/pages/todo/todo"
+    view.btn-nav(
+      bindtap="navTodo"
     ) Todos
 </template>
 
 <script>
 export default Page({
+  $route: 'home/home',
+
   data: {
     title: 'MINA VUE',
     desc: '用Vue单文件组件的方式开发小程序'
   },
 
-  onLoad() {
+  onLoad () {
     console.log('on page load.')
+  },
+
+  navTodo (e) {
+    this.$navigateTo('todo/todo?a=1&b=2')
   }
 })
 </script>
@@ -34,7 +40,7 @@ export default Page({
       font-size: 36rpx;
     }
 
-    navigator {
+    .btn-nav {
       color: blue;
       text-decoration: underline;
       margin-top: 50rpx;

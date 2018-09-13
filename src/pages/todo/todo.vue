@@ -8,6 +8,8 @@
 
 <script>
 export default Page({
+  $route: 'pages/todo/todo',
+
   config: {
     usingComponents: {
       'todo-list': '../../components/todo-list/todo-list'
@@ -22,6 +24,16 @@ export default Page({
       '3. 移植常用组件',
       '4. Enjoy coding'
     ]
+  },
+
+  onPreload ({ route, query }) {
+    this.$set(route, new Promise(resolve => setTimeout(_ => resolve('test'), 500)))
+  },
+
+  onLoad (query) {
+    this.$get(this.$route).then(data => {
+      console.log('preload data: ', data)
+    })
   }
 })
 </script>

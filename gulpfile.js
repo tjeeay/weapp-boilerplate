@@ -1,4 +1,3 @@
-const path = require('path')
 const gulp = require('gulp')
 const del = require('del')
 const runSequence = require('run-sequence')
@@ -61,8 +60,7 @@ gulp.task('compile:scss', _ => {
 const compileScript = (src) => {
   return src
     .pipe(plugins.babel({
-      presets: ['@babel/env'],
-      plugins: ['@babel/transform-runtime']
+      presets: ['@babel/env']
     }))
     .pipe(plugins.if(isProduction(), plugins.uglify()))
     .pipe(gulp.dest(distDir))
