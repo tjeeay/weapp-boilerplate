@@ -1,7 +1,7 @@
 const storage = {}
 
 /**
- * 
+ * set storage
  * @param {String} key 
  * @param {*} val 
  * @param {Number} duration 单位：min
@@ -29,6 +29,11 @@ storage.get = (key) => {
         return null
       }
       return value
+    }, ({ errMsg }) => {
+      if (errMsg === 'getStorage:fail data not found') {
+        return null
+      }
+      throw new Error(errMsg)
     })
 }
 

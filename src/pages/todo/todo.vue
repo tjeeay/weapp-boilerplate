@@ -7,8 +7,10 @@
 </template>
 
 <script>
+import regeneratorRuntime  from '../../lib/regenerator/runtime-module.js'
+
 export default Page({
-  $route: 'pages/todo/todo',
+  $route: 'todo/todo',
 
   config: {
     usingComponents: {
@@ -27,13 +29,14 @@ export default Page({
   },
 
   onPreload ({ route, query }) {
-    this.$set(route, new Promise(resolve => setTimeout(_ => resolve('test'), 500)))
+    this.$preset(route, new Promise(resolve => {
+      setTimeout(_ => resolve('test'), 1500)
+    }))
   },
 
-  onLoad (query) {
-    this.$get(this.$route).then(data => {
-      console.log('preload data: ', data)
-    })
+  async onLoad (query) {
+    const data = await this.$getPreset()
+    console.log('preload data: ', data)
   }
 })
 </script>

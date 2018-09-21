@@ -1,5 +1,6 @@
 import util from '../utils/util.js'
 import BaseMinxin from '../mixins/base.js'
+import regeneratorRuntime from './regenerator/runtime-module'
 
 /**
  * promisify wx api
@@ -46,33 +47,54 @@ Page = function (options) {
     let mixin = { ...item }
     if (!util.isObject(mixin)) continue
 
-    // data
-    if (util.isObject(mixin.data)) {
-      opts.data = { ...mixin.data, ...opts.data }
-    }
-    delete mixin.data
-
     for (let key in mixin) {
+      const prop = mixin[key]
 
-      // custom property/function
-      if (!~lifecycleHooks.indexOf(key)) {
-        opts[key] = opts[key] || mixin[key]
-        continue 
+      if (~lifecycleHooks.indexOf(key) && !util.isFunction(prop)) {
+        console.warn(`page hook '${key}' must be a function.`)
+        continue
       }
 
-      // lifecycle hooks
-      const originHook = opts[key] || function () { }
-      if (util.isFunction(mixin[key])) {
-        opts[key] = function () {
-          originHook.apply(this, arguments)
-          mixin[key].apply(this, arguments)
+      // undefined: set
+      if (!(key in opts)) {
+        opts[key] = prop
+      }
+      // for function: chain
+      else if (util.isFunction(prop)) {
+        if (util.isFunction(opts[key])) {
+          const originFn = opts[key]
+          opts[key] = function () {
+            originFn.apply(this, arguments)
+            prop.apply(this, arguments)
+          }
         }
-      } else {
-        console.warn(`page hook '${key}' must be a function.`)
+      }
+      // for object: merge
+      else if (util.isObject(prop)) {
+        if (util.isObject(opts[key])) {
+          opts[key] = { ...prop, ...opts[key] }
+        }
       }
     }
   }
   delete opts.mixins
+
+  // overwirte onLoad,
+  // and promisify this.setData()
+  const onLoad = opts.onLoad
+  opts.onLoad = function () {
+    const page = this
+
+    page.$setData = function (data) {
+      return new Promise(resolve => {
+        page.setData(data, resolve)
+      })
+    }
+
+    if (typeof onLoad === 'function') {
+      onLoad.apply(page, arguments)
+    }
+  }
 
   // preload lifecycle
   if (opts.$route) {

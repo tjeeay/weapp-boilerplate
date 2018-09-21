@@ -22,7 +22,7 @@ export default Page({
   },
 
   navTodo (e) {
-    this.$navigateTo('todo/todo?a=1&b=2')
+    this.$switchTab('todo/todo')
   }
 })
 </script>

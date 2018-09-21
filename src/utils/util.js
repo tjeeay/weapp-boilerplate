@@ -1,3 +1,4 @@
+import config from "../config/index.js";
 
 const util = {}
 
@@ -51,6 +52,27 @@ util.normalizeUrl = (url) => {
   url = `/${url}`
 
   return url
+}
+
+util.trimStart = (str, char) => {
+  if (str[0] === char) {
+    return util.trimStart(str.substr(1))
+  }
+  return str
+}
+
+util.trimEnd = (str, char) => {
+  if (str[str.length - 1] === char) {
+    return util.trimEnd(str.substr(0, str.length - 1))
+  }
+  return str
+}
+
+util.stringifyQuery = query => {
+  return Object.keys(query).reduce((arr, key) => {
+    arr.push(`${key}=${query[key]}`)
+    return arr
+  }, []).join('&')
 }
 
 export default util

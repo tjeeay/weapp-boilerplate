@@ -1,3 +1,4 @@
-.vscode
+.vscode/
+.idea/
 node_modules/
 dist/

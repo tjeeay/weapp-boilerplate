@@ -1,0 +1,21 @@
+.arrow {
+  display: inline-block;
+  width: 20rpx;
+  height: 20rpx;
+  border-top: 2rpx solid #ffc618;
+  border-left: 2rpx solid #ffc618;
+  transition: all 0.3s ease;
+
+  &.top {
+    transform: translateY(25%) rotate(45deg);
+  }
+  &.right {
+    transform: translateX(-25%) rotate(135deg);
+  }
+  &.bottom {
+    transform: translateY(-25%) rotate(225deg);
+  }
+  &.left {
+    transform: translateX(25%) rotate(315deg);
+  }
+}
