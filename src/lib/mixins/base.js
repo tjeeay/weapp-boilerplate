@@ -1,65 +1,20 @@
-import util from "../utils/util.js"
-
-const _obj = Object.create(null)
+import util from '../../utils/util.js'
+import preload from '../preload.js'
 
 export default {
   data: {
   },
 
-  $preset (key, val) {
-    const p = val instanceof Promise 
-                ? val
-                : Promise.resolve(val)
-    _obj[key] = p.then(data => data)
-  },
-
-  $getPreset () {
-    const key = `/${this.route}`
-    if (!(key in _obj)) {
-      return null
+  $getPreload (fetchFn, ...args) {
+    const argArray = [this.$route]
+    if (util.isFunction(fetchFn)) {
+      argArray.push(fetchFn.bind(null, ...args))
     }
-    const p = _obj[key]
-    delete _obj[key]
-    return p
+    return preload.getPreload.apply(preload, argArray)
   },
 
-  onPreload (query) {
-  },
-
-  $beforeLeave (url) {
-    const { route, query } = util.parseUrl(url)
-    const preloadFn = this.$_preloadFns[route]
-    if (util.isFunction(preloadFn)) {
-      preloadFn.call(this, { route, query })
-    }
-  },
-
-  $redirectTo (url) {
-    url = util.normalizeUrl(url)
-    this.$beforeLeave(url)
-    return wx.$redirectTo({ url })
-  },
-
-  $switchTab (url) {
-    url = util.normalizeUrl(url)
-    this.$beforeLeave(url)
-    return wx.$switchTab({ url })
-  },
-
-  $reLaunch (url) {
-    url = util.normalizeUrl(url)
-    this.$beforeLeave(url)
-    return wx.$reLaunch({ url })
-  },
-
-  $navigateTo (url) {
-    url = util.normalizeUrl(url)
-    this.$beforeLeave(url)
-    return wx.$navigateTo({ url })
-  },
-
-  $goto ({ target, detail }) {
-    let { type, path } = target.dataset
+  $goto ({ currentTarget, detail }) {
+    let { type, path } = currentTarget.dataset
 
     type = type || 'navigateTo'
     if (type[0] !== '$') {
@@ -70,12 +25,16 @@ export default {
       throw new Error(`not allowed type: ${type}`)
     }
 
+    // remove default event arguments
+    delete detail.x
+    delete detail.y
+
     const queryStr = util.stringifyQuery(detail)
     path = path.indexOf('?') === -1
       ? `${path}?${queryStr}`
       : `${path}&${queryStr}`
 
-    this[type](path)
+    wx[type](path)
   },
   
   /**
@@ -117,6 +76,16 @@ export default {
       ...options,
       title,
       icon
+    })
+  },
+
+  /**
+   * 拨打电话
+   * @param {Object} e.currentTarget.dataset.phone 电话号码
+   */
+  $makePhoneCall ({ currentTarget }) {
+    return wx.$makePhoneCall({
+      phoneNumber: currentTarget.dataset.phone
     })
   }
 }

@@ -10,8 +10,6 @@
 import regeneratorRuntime  from '../../lib/regenerator/runtime-module.js'
 
 export default Page({
-  $route: 'todo/todo',
-
   config: {
     usingComponents: {
       'todo-list': '../../components/todo-list/todo-list'
@@ -28,14 +26,14 @@ export default Page({
     ]
   },
 
-  onPreload ({ route, query }) {
-    this.$preset(route, new Promise(resolve => {
+  onPreload (query) {
+    return new Promise(resolve => {
       setTimeout(_ => resolve('test'), 1500)
-    }))
+    })
   },
 
   async onLoad (query) {
-    const data = await this.$getPreset()
+    const data = await this.$getPreload()
     console.log('preload data: ', data)
   }
 })

@@ -10,8 +10,6 @@
 
 <script>
 export default Page({
-  $route: 'home/home',
-
   data: {
     title: 'MINA VUE',
     desc: '用Vue单文件组件的方式开发小程序'
@@ -22,7 +20,7 @@ export default Page({
   },
 
   navTodo (e) {
-    this.$switchTab('todo/todo')
+    wx.$switchTab('todo/todo')
   }
 })
 </script>

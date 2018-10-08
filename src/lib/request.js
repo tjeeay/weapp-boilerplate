@@ -36,21 +36,27 @@ methods.map(method => {
     const token = await tokenManager.getAccessToken()
 
     if (tokenManager.isFetchingToken()) {
-      return tokenManager.pushWaitingRequest(opts)
+      return await tokenManager.pushWaitingRequest(opts)
     }
 
     opts.header = opts.header || {}
     opts.header['Authorization'] = `Bearer ${token}`
 
-    const res = await request.send(opts)
-
-    // token expired
-    if (res.statusCode === 401) {
-      await tokenManager.clearAccessToken()
-      return request[method](opts)
+    try {
+      const res = await request.send(opts)
+  
+      // token expired
+      if (res.statusCode === 401) {
+        await tokenManager.clearAccessToken()
+        return await request[method](opts)
+      }
+  
+      return res.data
+    } catch (err) {
+      console.error(`request filed: ${method} ${url}`, err)
     }
 
-    return res.data
+    return
   }
 })
 

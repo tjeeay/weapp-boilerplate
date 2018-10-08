@@ -5,8 +5,8 @@
 ## 特性
 
 * 支持 `.vue` 单文件组件开发小程序
-* 支持 `pug(jade)` 模板引擎编写 `wxml`
-* 支持 `SASS/SCSS` 预处理语法编写 `wxss`
+* 支持 `pug(jade)` 等模板引擎编写 `wxml`
+* 支持 `SASS/SCSS` 等预处理语法编写 `wxss`
 * 支持 `ES6`、`async/await` 编写 `js`
 * 自动检索并配置 `pages`
 * 支持通过预加载数据来提升性能

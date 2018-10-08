@@ -45,6 +45,8 @@ manager.getAccessToken = async _ => {
       const { options, resolve } = _waitingQequests.shift()
       request[options.method](options).then(res => resolve(res))
     }
+
+    return data.token
   } catch (reason) {
     console.warn(`failed to get token: ${reason}`)
     _fetching = false

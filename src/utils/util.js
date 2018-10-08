@@ -19,7 +19,7 @@ util.isFunction = (fn) => {
 }
 
 util.parseUrl = (url) => {
-  const [ route, search ] = url.split('?')
+  const [route, search] = url.split('?')
 
   let query = {}
   if (search) {
