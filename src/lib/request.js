@@ -12,6 +12,9 @@ const methods = [
   'delete'
 ]
 
+const maxRetry = 5
+let retryCounter = 0
+
 methods.map(method => {
   request[method] = async function (options) {
     let { url, data, header, dataType, responseType } = options
@@ -46,14 +49,28 @@ methods.map(method => {
       const res = await request.send(opts)
   
       // token expired
-      if (res.statusCode === 401) {
+      if (res.statusCode === 401 && retryCounter <= maxRetry) {
+        retryCounter++
         await tokenManager.clearAccessToken()
         return await request[method](opts)
+      }
+      retryCounter = 0
+
+      if (res.statusCode >= 500) {
+        wx.showToast({
+          title: '系统错误',
+          icon: 'none'
+        })
+        return
       }
   
       return res.data
     } catch (err) {
       console.error(`request filed: ${method} ${url}`, err)
+      wx.showToast({
+        title: '请求失败',
+        icon: 'none'
+      })
     }
 
     return
@@ -61,7 +78,7 @@ methods.map(method => {
 })
 
 function buildUrl (relativeUrl) {
-  if (/^http/.test(relativeUrl)) {
+  if (~relativeUrl.indexOf('://')) {
     return relativeUrl
   }
 
@@ -82,8 +99,20 @@ function buildUrl (relativeUrl) {
  * @param {String} options.responseType 响应的数据类型 default: text
  */
 request.send = async (options) => {
-  options.url = buildUrl(options.url)
-  return await wx.$request(options)
+  const opts = Object.assign({}, options)
+  opts.url = buildUrl(options.url)
+
+  if (!config.isProduction()) {
+    console.log(`${options.method.toUpperCase()} ${options.url}`, opts)
+  }
+
+  const res = await wx.$request(opts)
+
+  if (!config.isProduction()) {
+    console.log(`${res.statusCode}`, `${options.method.toUpperCase()} ${options.url}`, res)
+  }
+
+  return res
 }
 
 export default request

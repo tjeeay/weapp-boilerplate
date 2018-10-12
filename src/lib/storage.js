@@ -30,7 +30,9 @@ storage.get = (key) => {
       }
       return value
     }, (err) => {
-      console.error('getStorage failed: ', err)
+      if (err.errMsg !== 'getStorage:fail data not found') {
+        console.warn('getStorage failed: ', err)
+      }
       return null
     })
 }
